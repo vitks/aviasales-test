@@ -1,0 +1,14 @@
+.Sidebar {
+    width: 192px;
+    display: inline-block;
+    padding: 20px;
+    background: #FFFFFF;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+.Sidebar span {
+    line-height: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
