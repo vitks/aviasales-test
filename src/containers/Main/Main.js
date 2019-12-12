@@ -1,49 +1,84 @@
 import React, { Component } from 'react';
 
-import ButtonFilter from '../../components/Filters/ButtonFilter/ButtonFilter';
+import FilterForm from '../../components/FilterForm/FilterForm';
 
 import classes from './Main.module.css';
 
 class Main extends Component {
     state = {
-        elements: {
-            cheapest: {
-                type: 'Active',
-                position: 'Left',
-                text: 'Самый дешевый'
+        filterForm: {
+            formType: 'BUTTON_FILTER',
+            elements: {
+                cheapest: {
+                    value: false,
+                    position: 'Left',
+                    text: 'Самый дешевый'
+                },
+                fastest: {
+                    type: false,
+                    position: 'Right',
+                    text: 'Самый быстрый'
+                }
             },
-            fastest: {
-                type: 'Inactive',
-                position: 'Right',
-                text: 'Самый быстрый'
-            }
-        },
-        activeElement: 'cheapest'
+            activeElement: null
+        }
     }
 
-    filterButtonHandler = ( formElement ) => {
-        if (this.state.activeElement !== formElement) {
-            let updatedElements = {
-                ...this.state.elements,
-                [this.state.activeElement]: {
-                    ...this.state.elements[this.state.activeElement],
-                    type: 'Inactive'
-                },
-                [formElement]: {
-                    ...this.state.elements[formElement],
-                    type: 'Active'
+    filterButtonHandler = (formElement) => {
+        const { filterForm } = this.state;
+        let updatedFilterForm = null;
+
+        if (filterForm.activeElement !== formElement) {
+            if (filterForm.activeElement) {
+                updatedFilterForm = {
+                    ...filterForm,
+                    elements: {
+                        ...filterForm.elements,
+                        [filterForm.activeElement]: {
+                            ...filterForm.elements[filterForm.activeElement],
+                            value: !filterForm.elements[filterForm.activeElement].value
+                        },
+                        [formElement]: {
+                            ...filterForm.elements[formElement],
+                            value: !filterForm.elements[formElement].value
+                        }
+                    },
+                    activeElement: formElement
+                }
+            } else {
+                updatedFilterForm = {
+                    ...filterForm,
+                    elements: {
+                        ...filterForm.elements,
+                        [formElement]: {
+                            ...filterForm.elements[formElement],
+                            value: !filterForm.elements[formElement].value
+                        }
+                    },
+                    activeElement: formElement
                 }
             }
-
-            this.setState({ elements: updatedElements, activeElement: formElement });
+        // } else {
+        //     updatedFilterForm = {
+        //         ...filterForm,
+        //         elements: {
+        //             ...filterForm.elements,
+        //             [formElement]: {
+        //                 ...filterForm.elements[formElement],
+        //                 value: !filterForm.elements[formElement].value
+        //             }
+        //         },
+        //         activeElement: null
+        //     }
+        this.setState({ filterForm: updatedFilterForm });
         }
     }
 
     render() {
         return(
             <div className={ classes.Main }>
-                <ButtonFilter
-                    filterForm={ this.state.elements }
+                <FilterForm
+                    filterForm={ this.state.filterForm }
                     filterButtonClicked={ this.filterButtonHandler } />
             </div>
         );

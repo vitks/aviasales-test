@@ -1,0 +1,19 @@
+.Container {
+    display: flex;
+    padding: 10px 0;
+    font-weight: 400;
+    font-size: 13px;
+    align-items: center;
+    cursor: pointer;
+    width: 100%;
+}
+
+.Container:hover {
+    background-color: #F1FCFF;
+}
+
+.Container img {
+    display: inline-block;
+    padding-right: 10px;
+    margin-left: 20px;
+}
