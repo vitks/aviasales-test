@@ -6,8 +6,8 @@ import Segment from './Segment/Segment';
 import classes from './Ticket.module.css';
 
 const ticket = (props) => {
-    const form = props.data.segments.map(segment => {
-        return <Segment data={ segment } />;
+    const form = props.data.segments.map((segment, i) => {
+        return <Segment key={ i } data={ segment } />;
     });
 
 
