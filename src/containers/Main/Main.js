@@ -29,23 +29,28 @@ class Main extends Component {
         checkboxFilterForm: {
             formType: 'CHECKBOX_FILTER',
             elements: {
-                allOptions: {
+                all: {
+                    transfers: 'all',
                     text: 'Все',
                     value: true
                 },
-                noTransfer: {
+                zero: {
+                    transfers: 0,
                     text: 'Без пересадок',
                     value: true
                 },
-                oneTransfer: {
+                one: {
+                    transfers: 1,
                     text: '1 пересадка',
                     value: true
                 },
-                twoTransfers: {
+                two: {
+                    transfers: 2,
                     text: '2 пересадки',
                     value: true
                 },
-                threeTransfers: {
+                three: {
+                    transfers: 3,
                     text: '3 пересадки',
                     value: true
                 }
@@ -62,7 +67,7 @@ class Main extends Component {
             .then(result => {
                 axios.get(`tickets?searchId=${ result.data.searchId }`)
                     .then(searchResult => {
-                        this.setState({ tickets: searchResult.data.tickets.slice(0, 5), loading: false });
+                        this.setState({ tickets: searchResult.data.tickets, loading: false });
                     })
                     .catch(searchError => {
                         this.setState({ error: searchError, loading: false });
@@ -71,6 +76,50 @@ class Main extends Component {
             .catch(error => {
                 this.setState({ error: error, loading: false });
             });
+    }
+
+    buttonFiltration = (key) => {
+        const { tickets } = this.state;
+
+        if (tickets !== []) {
+            let filteredTickets = [];
+
+            if (key === 'cheapest') {
+                filteredTickets = tickets.sort((a, b) => {
+                    return a.price - b.price;
+                });
+            } else {
+                filteredTickets = tickets.sort((a, b) => {
+                    let ta = 0; 
+                    let tb = 0;
+
+                    a.segments.forEach(segment => {
+                        ta += segment.duration;
+                    });
+
+                    b.segments.forEach(segment => {
+                        tb += segment.duration;
+                    });
+
+                    return ta - tb;
+                });
+            }
+
+            return filteredTickets;
+        }
+    }
+
+    checkboxFiltration = () => {
+        const { checkboxFilterForm } = this.state;
+        let checkboxArray = [];
+
+        for (let key in checkboxFilterForm.elements) {
+            if (checkboxFilterForm.elements[key].value) {
+                checkboxArray.push(checkboxFilterForm.elements[key].transfers);
+            }
+        }
+
+        return checkboxArray;
     }
 
     filterButtonHandler = (formElement) => {
@@ -107,8 +156,10 @@ class Main extends Component {
                     activeElement: formElement
                 }
             }
+
+            const filteredTickets = this.buttonFiltration(formElement);
             
-            this.setState({ buttonFilterForm: updatedFilterForm });
+            this.setState({ buttonFilterForm: updatedFilterForm, tickets: filteredTickets });
         }
     }
 
@@ -116,7 +167,7 @@ class Main extends Component {
         const { checkboxFilterForm } = this.state;
         let updatedFilterForm = null;
 
-        if (formElement !== 'allOptions') {
+        if (formElement !== 'all') {
             updatedFilterForm = {
                 ...checkboxFilterForm,
                 elements: {
@@ -125,8 +176,8 @@ class Main extends Component {
                         ...checkboxFilterForm.elements[formElement],
                         value: !checkboxFilterForm.elements[formElement].value
                     },
-                    allOptions: {
-                        ...checkboxFilterForm.elements.allOptions,
+                    all: {
+                        ...checkboxFilterForm.elements.all,
                         value: false
                     }
                 }
@@ -135,13 +186,13 @@ class Main extends Component {
             let counter = Object.keys(updatedFilterForm.elements).length - 1;
 
             for (let key in updatedFilterForm.elements) {
-                if (key !== 'allOptions' && updatedFilterForm.elements[key].value === true) {
+                if (key !== 'all' && updatedFilterForm.elements[key].value === true) {
                     counter -= 1;
                 }
             }
 
             if (counter === 0) {
-                updatedFilterForm.elements.allOptions.value = true;
+                updatedFilterForm.elements.all.value = true;
             }
         } else {
             updatedFilterForm = {
@@ -165,6 +216,8 @@ class Main extends Component {
 
     render() {
         const { checkboxFilterForm, buttonFilterForm, tickets, error } = this.state;
+        const checkboxArray = this.checkboxFiltration();
+
 
         return(
             <div className={ classes.Main }>
@@ -176,6 +229,7 @@ class Main extends Component {
                         filterForm={ buttonFilterForm }
                         filterButtonClicked={ this.filterButtonHandler } />
                     <TicketList
+                        filter={ checkboxArray }
                         error={ error }
                         data={ tickets } />
                 </Layout>
