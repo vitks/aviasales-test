@@ -1,0 +1,17 @@
+.TicketHeader {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.Price {
+    margin: 6px 0 16px 20px;
+    font-size: 24px;
+    color: #2196F3;
+    text-transform: uppercase;
+}
+
+.Logo {
+    width: 110px;
+    margin: 0 30px 10px 0;
+}

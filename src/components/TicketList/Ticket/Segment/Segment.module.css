@@ -1,0 +1,22 @@
+.Segment {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.Block {
+    display: inline-block;
+    width: 33%;
+    margin: 10px 0 0 20px;
+}
+
+.Title {
+    display: block;
+    color: #A0B0B9;
+    text-transform: uppercase;
+}
+
+.Content {
+    line-height: 21px;
+    font-size: 14px;
+}
