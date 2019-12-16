@@ -1,19 +1,16 @@
 import React from 'react';
 
 import Spinner from '../UI/Spinner/Spinner';
-import Ticket from './Ticket/Ticket'
+import Ticket from './Ticket/Ticket';
+
+import classes from './TicketList.module.css';
 
 const ticketList = (props) => {
-    const style = {
-        fontSize: '50px',
-        textTransform: 'uppercase',
-        textAlign: 'center'
-    };
     let form = <Spinner />;
 
     if (!props.loading) {
         if (props.error !== null) {
-            form = <p style={ style }>{ props.error.response.data }</p>;
+            form = <p className={ classes.Error }>{ props.error.response.data }</p>;
         } else {
             let counter = 0;
 

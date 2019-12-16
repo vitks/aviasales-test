@@ -16,12 +16,14 @@ class Main extends Component {
                 cheapest: {
                     value: false,
                     position: 'Left',
-                    text: 'Самый дешевый'
+                    text: 'Самый дешевый',
+                    filter: () => this.cheapestFilter()
                 },
                 fastest: {
                     type: false,
                     position: 'Right',
-                    text: 'Самый быстрый'
+                    text: 'Самый быстрый',
+                    filter: () => this.fastestFilter()
                 }
             },
             activeElement: null
@@ -78,32 +80,36 @@ class Main extends Component {
             });
     }
 
-    buttonFiltration = (key) => {
-        const { tickets } = this.state;
+    cheapestFilter = () => {
+        if (this.state.tickets !== []) {
 
-        if (tickets !== []) {
+            let filteredTickets = [];
+            filteredTickets = this.state.tickets.sort((a, b) => {
+                return a.price - b.price;
+            });
+
+            return filteredTickets;
+        }
+    }
+
+    fastestFilter = () => {
+        if (this.state.tickets !== []) {
             let filteredTickets = [];
 
-            if (key === 'cheapest') {
-                filteredTickets = tickets.sort((a, b) => {
-                    return a.price - b.price;
+            filteredTickets = this.state.tickets.sort((a, b) => {
+                let ta = 0; 
+                let tb = 0;
+
+                a.segments.forEach(segment => {
+                    ta += segment.duration;
                 });
-            } else {
-                filteredTickets = tickets.sort((a, b) => {
-                    let ta = 0; 
-                    let tb = 0;
 
-                    a.segments.forEach(segment => {
-                        ta += segment.duration;
-                    });
-
-                    b.segments.forEach(segment => {
-                        tb += segment.duration;
-                    });
-
-                    return ta - tb;
+                b.segments.forEach(segment => {
+                    tb += segment.duration;
                 });
-            }
+
+                return ta - tb;
+            });
 
             return filteredTickets;
         }
@@ -157,9 +163,7 @@ class Main extends Component {
                 }
             }
 
-            const filteredTickets = this.buttonFiltration(formElement);
-            
-            this.setState({ buttonFilterForm: updatedFilterForm, tickets: filteredTickets });
+            this.setState({ buttonFilterForm: updatedFilterForm, tickets: buttonFilterForm.elements[formElement].filter() });
         }
     }
 
@@ -217,7 +221,6 @@ class Main extends Component {
     render() {
         const { checkboxFilterForm, buttonFilterForm, tickets, error } = this.state;
         const checkboxArray = this.checkboxFiltration();
-
 
         return(
             <div className={ classes.Main }>
