@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import  { connect }  from 'react-redux';
 
 import Layout from '../../hoc/Layout/Layout'
 import Sidebar from '../../components/Sidebar/Sidebar';
@@ -6,6 +7,7 @@ import FilterForm from '../../components/FilterForm/FilterForm';
 import TicketList from '../../components/TicketList/TicketList';
 import axios from '../../axios';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
+import * as actionTypes from '../../store/actions';
 
 import classes from './Main.module.css';
 
@@ -59,9 +61,7 @@ class Main extends Component {
                 }
             }
         },
-        searchId: null,
-        loading: true,
-        tickets: []
+        loading: true
     }
 
     componentDidMount() {
@@ -69,7 +69,8 @@ class Main extends Component {
             .then(result => {
                 axios.get(`tickets?searchId=${ result.data.searchId }`)
                     .then(searchResult => {
-                        this.setState({ tickets: searchResult.data.tickets, loading: false });
+                        this.props.setTicketList(searchResult.data.tickets);
+                        this.setState({ loading: false })
                     })
                     .catch(error => {
                         this.setState({ loading: false });
@@ -84,19 +85,19 @@ class Main extends Component {
         if (this.state.tickets !== []) {
 
             let filteredTickets = [];
-            filteredTickets = this.state.tickets.sort((a, b) => {
+            filteredTickets = this.props.tickets.sort((a, b) => {
                 return a.price - b.price;
             });
 
-            return filteredTickets;
+            this.props.setTicketList(filteredTickets);
         }
     }
 
     fastestFilter = () => {
-        if (this.state.tickets !== []) {
+        if (this.props.tickets !== []) {
             let filteredTickets = [];
 
-            filteredTickets = this.state.tickets.sort((a, b) => {
+            filteredTickets = this.props.tickets.sort((a, b) => {
                 let ta = 0; 
                 let tb = 0;
 
@@ -111,7 +112,7 @@ class Main extends Component {
                 return ta - tb;
             });
 
-            return filteredTickets;
+            this.props.setTicketList(filteredTickets);
         }
     }
 
@@ -163,7 +164,8 @@ class Main extends Component {
                 }
             }
 
-            this.setState({ buttonFilterForm: updatedFilterForm, tickets: buttonFilterForm.elements[formElement].filter() });
+            buttonFilterForm.elements[formElement].filter();
+            this.setState({ buttonFilterForm: updatedFilterForm });
         }
     }
 
@@ -219,7 +221,7 @@ class Main extends Component {
     }
 
     render() {
-        const { checkboxFilterForm, buttonFilterForm, tickets } = this.state;
+        const { checkboxFilterForm, buttonFilterForm } = this.state;
         const checkboxArray = this.checkboxFiltration();
 
         return(
@@ -233,11 +235,23 @@ class Main extends Component {
                         filterButtonClicked={ this.filterButtonHandler } />
                     <TicketList
                         filter={ checkboxArray }
-                        data={ tickets } />
+                        data={ this.props.tickets } />
                 </Layout>
             </div>
         );
     }
 }
 
-export default withErrorHandler(Main, axios);
+const mapStateToProps = state => {
+    return {
+        tickets: state.tickets
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        setTicketList: (ticketArray) => dispatch({type: actionTypes.SET_TICKET_LIST, tickets: ticketArray})
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(Main, axios));
