@@ -5,6 +5,7 @@ import Sidebar from '../../components/Sidebar/Sidebar';
 import FilterForm from '../../components/FilterForm/FilterForm';
 import TicketList from '../../components/TicketList/TicketList';
 import axios from '../../axios';
+import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 
 import classes from './Main.module.css';
 
@@ -60,7 +61,6 @@ class Main extends Component {
         },
         searchId: null,
         loading: true,
-        error: null,
         tickets: []
     }
 
@@ -71,12 +71,12 @@ class Main extends Component {
                     .then(searchResult => {
                         this.setState({ tickets: searchResult.data.tickets, loading: false });
                     })
-                    .catch(searchError => {
-                        this.setState({ error: searchError, loading: false });
+                    .catch(error => {
+                        this.setState({ loading: false });
                     });
             })
             .catch(error => {
-                this.setState({ error: error, loading: false });
+                this.setState({ loading: false });
             });
     }
 
@@ -219,7 +219,7 @@ class Main extends Component {
     }
 
     render() {
-        const { checkboxFilterForm, buttonFilterForm, tickets, error } = this.state;
+        const { checkboxFilterForm, buttonFilterForm, tickets } = this.state;
         const checkboxArray = this.checkboxFiltration();
 
         return(
@@ -233,7 +233,6 @@ class Main extends Component {
                         filterButtonClicked={ this.filterButtonHandler } />
                     <TicketList
                         filter={ checkboxArray }
-                        error={ error }
                         data={ tickets } />
                 </Layout>
             </div>
@@ -241,4 +240,4 @@ class Main extends Component {
     }
 }
 
-export default Main;
+export default withErrorHandler(Main, axios);
